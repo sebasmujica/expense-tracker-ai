@@ -2,9 +2,11 @@ import { Expense, ExpenseFilters, ExpenseSummary, Category, CATEGORIES } from '@
 import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval, subMonths } from 'date-fns';
 
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('es-PY', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'PYG',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(amount);
 }
 
@@ -117,7 +119,7 @@ export function exportToCSV(expenses: Expense[]): string {
     formatDate(exp.date),
     `"${exp.description.replace(/"/g, '""')}"`,
     exp.category,
-    exp.amount.toFixed(2),
+    exp.amount.toFixed(0),
   ]);
 
   return [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');

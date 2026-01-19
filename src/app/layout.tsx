@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ExpenseProvider } from "@/context/ExpenseContext";
+import { IncomeProvider } from "@/context/IncomeContext";
+import { BudgetProvider } from "@/context/BudgetContext";
 import { Header } from "@/components/layout/Header";
 
 const inter = Inter({
@@ -10,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ExpenseTracker - Manage Your Finances",
-  description: "A modern expense tracking application to help you manage your personal finances",
+  title: "ExpenseTracker - Administra tus Finanzas",
+  description: "Una aplicación moderna para el seguimiento de gastos y administración de finanzas personales",
 };
 
 export default function RootLayout({
@@ -20,13 +22,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body className={`${inter.variable} font-sans antialiased bg-gray-50`}>
         <ExpenseProvider>
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-          </div>
+          <IncomeProvider>
+            <BudgetProvider>
+              <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-1">{children}</main>
+              </div>
+            </BudgetProvider>
+          </IncomeProvider>
         </ExpenseProvider>
       </body>
     </html>
