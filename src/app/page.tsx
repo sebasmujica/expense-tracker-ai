@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useExpenses } from '@/context/ExpenseContext';
 import { useIncomes } from '@/context/IncomeContext';
 import { useBudgets } from '@/context/BudgetContext';
@@ -10,16 +10,30 @@ import { SpendingChart } from '@/components/dashboard/SpendingChart';
 import { CategoryBreakdown } from '@/components/dashboard/CategoryBreakdown';
 import { ExportButton } from '@/components/dashboard/ExportButton';
 import { ExpenseItem } from '@/components/expenses/ExpenseItem';
+import { ExpenseForm } from '@/components/expenses/ExpenseForm';
 import { Card, CardHeader, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { CATEGORIES, Category } from '@/types/expense';
+import { Modal } from '@/components/ui/Modal';
+import { CATEGORIES, Category, Expense, ExpenseFormData } from '@/types/expense';
 import { startOfMonth, endOfMonth, isWithinInterval, parseISO } from 'date-fns';
 import Link from 'next/link';
 
 export default function DashboardPage() {
-  const { expenses, isLoading: expensesLoading, deleteExpense } = useExpenses();
+  const { expenses, isLoading: expensesLoading, deleteExpense, updateExpense } = useExpenses();
   const { getMonthlyIncome, isLoading: incomesLoading } = useIncomes();
   const { savingsGoals, isLoading: budgetLoading, budgets, getBudgetStatus, getTotalBudgeted } = useBudgets();
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+
+  const handleEditExpense = (expense: Expense) => {
+    setEditingExpense(expense);
+  };
+
+  const handleEditSubmit = (data: ExpenseFormData) => {
+    if (editingExpense) {
+      updateExpense(editingExpense.id, data);
+      setEditingExpense(null);
+    }
+  };
 
   const summary = useMemo(() => calculateSummary(expenses), [expenses]);
   const monthlyIncome = getMonthlyIncome();
@@ -283,7 +297,7 @@ export default function DashboardPage() {
                 <ExpenseItem
                   key={expense.id}
                   expense={expense}
-                  onEdit={() => {}}
+                  onEdit={handleEditExpense}
                   onDelete={deleteExpense}
                 />
               ))}
@@ -314,6 +328,27 @@ export default function DashboardPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit Expense Modal */}
+      <Modal
+        isOpen={!!editingExpense}
+        onClose={() => setEditingExpense(null)}
+        title="Editar Gasto"
+      >
+        {editingExpense && (
+          <ExpenseForm
+            initialData={{
+              amount: editingExpense.amount.toString(),
+              category: editingExpense.category,
+              description: editingExpense.description,
+              date: editingExpense.date,
+            }}
+            onSubmit={handleEditSubmit}
+            onCancel={() => setEditingExpense(null)}
+            isEditing
+          />
+        )}
+      </Modal>
     </div>
   );
 }

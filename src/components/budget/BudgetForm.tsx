@@ -27,8 +27,12 @@ export function BudgetForm({
   isEditing = false,
   existingCategories = [],
 }: BudgetFormProps) {
+  const availableCategories = isEditing
+    ? CATEGORIES
+    : CATEGORIES.filter((cat) => !existingCategories.includes(cat));
+
   const [formData, setFormData] = useState<BudgetFormData>({
-    category: initialData?.category || 'Food',
+    category: initialData?.category || availableCategories[0] || 'Food',
     amount: initialData?.amount || '',
   });
   const [errors, setErrors] = useState<FormErrors>({});
@@ -90,10 +94,6 @@ export function BudgetForm({
       }
     }
   };
-
-  const availableCategories = isEditing
-    ? CATEGORIES
-    : CATEGORIES.filter((cat) => !existingCategories.includes(cat));
 
   const categoryOptions = availableCategories.map((cat) => ({
     value: cat,
